@@ -1,0 +1,22 @@
+{
+  "name": "proc-server",
+  "version": "1.0.0",
+  "description": "Server side for Procurement",
+  "main": "server.js",
+  "scripts": {
+    "start": "gulp"
+  },
+  "author": "Johnny",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "mongoose": "^4.7.0",
+    "morgan": "^1.7.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-sourcemaps": "^1.9.1",
+    "gulp-typescript": "^3.1.3",
+    "typescript": "^2.0.10"
+  }
+}
