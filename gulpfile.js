@@ -2,6 +2,7 @@ var gulp 		= 	require("gulp");
 var ts 			= 	require("gulp-typescript");
 var sourcemaps	=	require('gulp-sourcemaps');
 var tsProject 	= 	ts.createProject("tsconfig.json");
+var nodemon 	= 	require('gulp-nodemon');
 
 gulp.task("compile", function () {
 	console.log('compiling...');
@@ -27,4 +28,12 @@ gulp.task('resources', function() {
 		.pipe(gulp.dest('build'));
 })
 
-gulp.task('default', ['compile', 'watch', 'resources']);
+gulp.task('start', function() {
+	nodemon({
+		script: 'build/server.js',
+		env: { 'NODE_ENV': 'development' },
+		watch: 'build/*'
+	});
+})
+
+gulp.task('default', ['compile', 'watch', 'resources', 'start']);
