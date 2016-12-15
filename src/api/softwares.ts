@@ -39,7 +39,7 @@ module.exports = function(app) {
 	})
 
 	// GET a Software by ID
-	app.get('api/software/:software_id', middlewares.requireLogin, function (req, res) {
+	app.get('/api/software/:software_id', middlewares.requireLogin, function (req, res) {
 		Softwares.findById(req.params.software_id)
 		.exec(function(err,soft) {
 			if(err) {
@@ -49,6 +49,7 @@ module.exports = function(app) {
 			res.json(soft);
 		});
 	});
+	
 
 	// POST a Software
 	app.post('/api/software', middlewares.requireLogin, function (req, res) {
@@ -69,7 +70,7 @@ module.exports = function(app) {
 	});
 
 	// DELETE a Software by ID
-	app.delete('api/software/:software_id', middlewares.canEditSoft, function(req, res) {
+	app.delete('/api/software/:software_id', middlewares.canEditSoft, function(req, res) {
 		Softwares.remove({
 			_id: req.params.software_id
 		}, function (err, soft) {
