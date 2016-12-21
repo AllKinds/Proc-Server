@@ -1,7 +1,11 @@
+import { AmountByYear } from '../models/purchase';
+
 module.exports = function (app) {
 	var PurchaseDb = require('../models/purchase');
 	var Purchases = PurchaseDb.Purchase;
 	var middlewares = require('../middlewares');
+
+
 
 	// Functions
 
@@ -28,6 +32,43 @@ module.exports = function (app) {
 
 	function validatePurchase(soft) {
 		return true;
+	}
+
+	function newAmountForYear(purchaseId: string, amountOfYear: AmountByYear, res) {
+		Purchases.findById(purchaseId, function(err, purchase) {
+			if(err) {
+				res.send(err);
+				console.error(err);
+			}
+			if(!purchase){
+				res.status(404).send('Purchase not found');
+			}
+			else {
+				let years = [];
+				for(let i=0; i< purchase.amounts.length; i++) {
+					years.push( purchase.amounts[i].year );
+				}
+				// for(let yearlyAmount in purchase.amounts){
+				// 	years.push(yearlyAmount.year);
+				// }
+				if(years.includes(amountOfYear.year)){
+					// Udpate the yearlyAmount
+					let year_index = years.indexOf(amountOfYear.year);
+					purchase.amounts[year_index] =  amountOfYear;
+				}
+				else {
+					purchase.amounts.push(amountOfYear);
+				}
+				purchase.save(function(err) {
+					if(err) {
+						console.log(err);
+						res.status(500).send('Internal Server Error \nCan\'t change status of request. \nContact system admin.');
+					} else {
+						res.json(purchase);
+					}
+				});
+			}
+		})
 	}
 
 	// Requests
@@ -85,5 +126,10 @@ module.exports = function (app) {
 	});
 
 	// PUT ?? update
-
+	app.put('/api/purchase/:purchase_id/newYear', middlewares.canEditSoft, function (req, res) {
+		let amountByYear: AmountByYear = req.body.amountByYear;
+		// let amountByYear = {"year": 1970,"amount": 5};
+		let purchase_id: string = req.params.purchase_id;
+		newAmountForYear(purchase_id, amountByYear, res);
+	});
 };
