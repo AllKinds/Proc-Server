@@ -2,6 +2,7 @@
 
 import * as mongoose from 'mongoose';
 
+
 export interface AmountByYear {
 	year:	number;
 	amount:	number;
@@ -10,15 +11,16 @@ export interface AmountByYear {
 let Schema = mongoose.Schema;
 
 export interface IPurchase extends mongoose.Document {
-	softwareId: 	number;
+	software: 	any;
 	unitId: 		number;
 	subUnit: 		string;
 	amounts: 		AmountByYear[];
 };
 
 export const PurchaseSchema = new mongoose.Schema({
-	softwareId: {
-		type: Number,
+	software: {
+		type: Schema.ObjectId,
+		ref:  'Software',
 		required: true
 	},
 	unitId: {

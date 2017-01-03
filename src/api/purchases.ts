@@ -3,6 +3,8 @@ import { AmountByYear } from '../models/purchase';
 module.exports = function (app) {
 	var PurchaseDb = require('../models/purchase');
 	var Purchases = PurchaseDb.Purchase;
+	var SoftwareDb = require('../models/software');
+	var Softwares = SoftwareDb.Software;
 	var middlewares = require('../middlewares');
 
 
@@ -11,10 +13,12 @@ module.exports = function (app) {
 
 	function fetchPurchases(req, res) {
 		PurchaseDb.Purchase.find()
+			.populate('software')
 			.exec(function (err, softs) {
 				if (err) {
 					res.send(err);
 				}
+				console.log(softs[0].software)
 				res.header("Access-Control-Allow-Origin", "*"); // No 'Access-Control-Allow-Origin' Fix
 				res.json(softs);
 			});
@@ -26,6 +30,7 @@ module.exports = function (app) {
 				res.send(err);
 				console.error(err);
 			}
+			// purchase.populate('software');
 			res.json(soft);
 		});
 	}
@@ -54,9 +59,14 @@ module.exports = function (app) {
 				if(years.includes(amountOfYear.year)){
 					// Udpate the yearlyAmount
 					let year_index = years.indexOf(amountOfYear.year);
-					purchase.amounts[year_index] =  amountOfYear;
+					if(amountOfYear.amount <= 0) {
+						purchase.amounts.splice(year_index, 1);
+					}
+					else {
+						purchase.amounts[year_index] =  amountOfYear;
+					}
 				}
-				else {
+				else if(amountOfYear.amount > 0) {
 					purchase.amounts.push(amountOfYear);
 				}
 				purchase.save(function(err) {
@@ -96,7 +106,7 @@ module.exports = function (app) {
 	app.post('/api/purchase', middlewares.requireLogin, function (req, res) {
 		// let purchase = req.body.purchase;
 		let purchase = {
-			softwareId: req.body.softwareId,
+			software: req.body.software,
 			unitId: req.body.unitId,
 			subUnit: req.body.subUnit,
 			amounts: req.body.amounts
