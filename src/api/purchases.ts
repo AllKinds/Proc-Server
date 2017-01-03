@@ -14,28 +14,34 @@ module.exports = function (app) {
 	function fetchPurchases(req, res) {
 		PurchaseDb.Purchase.find()
 			.populate('software')
-			.exec(function (err, softs) {
+			.exec(function (err, prcss) {
 				if (err) {
 					res.send(err);
 				}
-				console.log(softs[0].software)
 				res.header("Access-Control-Allow-Origin", "*"); // No 'Access-Control-Allow-Origin' Fix
-				res.json(softs);
+				res.json(prcss);
 			});
 	}
 
 	function createPurchase(purchase, req, res) {
-		Purchases.create(purchase, function (err, soft) {
+		Purchases.create(purchase, function (err, prcs) {
 			if (err) {
 				res.send(err);
 				console.error(err);
 			}
-			// purchase.populate('software');
-			res.json(soft);
+			prcs.populate('software', function(err) {
+				if(err) {
+					res.send(err);
+					console.error(err);
+				}
+				console.log(prcs);
+				res.json(prcs);
+			});
+			
 		});
 	}
 
-	function validatePurchase(soft) {
+	function validatePurchase(prcs) {
 		return true;
 	}
 
@@ -92,12 +98,12 @@ module.exports = function (app) {
 	// GET a Purchase by ID
 	app.get('/api/purchase/:purchase_id', middlewares.requireLogin, function (req, res) {
 		Purchases.findById(req.params.purchase_id)
-			.exec(function (err, soft) {
+			.exec(function (err, prcs) {
 				if (err) {
 					res.send(err);
 				}
 
-				res.json(soft);
+				res.json(prcs);
 			});
 	});
 
@@ -127,7 +133,7 @@ module.exports = function (app) {
 		}
 		Purchases.remove({
 			_id: req.params.purchase_id
-		}, function (err, soft) {
+		}, function (err, prcs) {
 			if (err) {
 				res.send(err);
 			}
