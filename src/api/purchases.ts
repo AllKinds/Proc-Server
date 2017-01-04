@@ -3,8 +3,8 @@ import { AmountByYear } from '../models/purchase';
 module.exports = function (app) {
 	var PurchaseDb = require('../models/purchase');
 	var Purchases = PurchaseDb.Purchase;
-	var SoftwareDb = require('../models/software');
-	var Softwares = SoftwareDb.Software;
+	// var SoftwareDb = require('../models/software');
+	// var Softwares = SoftwareDb.Software;
 	var middlewares = require('../middlewares');
 
 
@@ -14,6 +14,7 @@ module.exports = function (app) {
 	function fetchPurchases(req, res) {
 		PurchaseDb.Purchase.find()
 			.populate('software')
+			.populate('unit')
 			.exec(function (err, prcss) {
 				if (err) {
 					res.send(err);
@@ -29,7 +30,7 @@ module.exports = function (app) {
 				res.send(err);
 				console.error(err);
 			}
-			prcs.populate('software', function(err) {
+			prcs.populate('software').populate('unit', function(err) {
 				if(err) {
 					res.send(err);
 					console.error(err);
@@ -113,8 +114,7 @@ module.exports = function (app) {
 		// let purchase = req.body.purchase;
 		let purchase = {
 			software: req.body.software,
-			unitId: req.body.unitId,
-			subUnit: req.body.subUnit,
+			unit: req.body.unit,
 			amounts: req.body.amounts
 		}
 		if (validatePurchase(purchase)) {
