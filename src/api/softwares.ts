@@ -18,7 +18,7 @@ module.exports = function (app) {
 	// GET all Softwares
 	app.get('/api/softwares', middlewares.requireLogin, function (req, res) {
 		getAllSoftwares().then(function(result) {
-			res.send(result);
+			res.json(result);
 		}).catch(function(err) {
 			res.send(err);
 			console.error(err);
@@ -29,7 +29,7 @@ module.exports = function (app) {
 	app.get('/api/software/:software_id', middlewares.requireLogin, function (req, res) {
 		let id = req.params.software_id
 		getSoftware(id).then(function(soft) {
-			res.send(soft);
+			res.json(soft);
 		}).catch(function(err) {
 			res.send(err);
 			console.log(err);
@@ -39,7 +39,6 @@ module.exports = function (app) {
 
 	// POST a Software
 	app.post('/api/software', middlewares.requireLogin, function (req, res) {
-		// let software = req.body.software;
 		let software = {
 			softwareId: req.body.softwareId,
 			softwareName: req.body.softwareName,
@@ -48,7 +47,7 @@ module.exports = function (app) {
 		}
 		if (validateSoftware(software)) {
 			addSoftware(software).then(function(soft) {
-				res.send(soft)
+				res.json(soft)
 			}).catch(function(err) {
 				res.send(err);
 				console.log(err);

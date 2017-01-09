@@ -1,49 +1,36 @@
+"use strict";
+// import { getAll, getOne, add, remove} from '../managers/templateManager';
+var softwares_1 = require('../managers/softwares');
 module.exports = function (app) {
     var SoftwareDb = require('../models/software');
     var Softwares = SoftwareDb.Software;
     var middlewares = require('../middlewares');
     // Functions
-    function fetchSoftwares(req, res) {
-        SoftwareDb.Software.find()
-            .exec(function (err, softs) {
-            if (err) {
-                res.send(err);
-            }
-            res.header("Access-Control-Allow-Origin", "*"); // No 'Access-Control-Allow-Origin' Fix
-            res.json(softs);
-        });
-    }
-    function createSoftware(software, req, res) {
-        Softwares.create(software, function (err, soft) {
-            if (err) {
-                res.send(err);
-                console.error(err);
-            }
-            res.json(soft);
-        });
-    }
     function validateSoftware(soft) {
         return true;
     }
     // Requests
     // GET all Softwares
     app.get('/api/softwares', middlewares.requireLogin, function (req, res) {
-        console.log('Hello World!!');
-        fetchSoftwares(req, res);
+        softwares_1.getAllSoftwares().then(function (result) {
+            res.json(result);
+        }).catch(function (err) {
+            res.send(err);
+            console.error(err);
+        });
     });
     // GET a Software by ID
     app.get('/api/software/:software_id', middlewares.requireLogin, function (req, res) {
-        Softwares.findById(req.params.software_id)
-            .exec(function (err, soft) {
-            if (err) {
-                res.send(err);
-            }
+        var id = req.params.software_id;
+        softwares_1.getSoftware(id).then(function (soft) {
             res.json(soft);
+        }).catch(function (err) {
+            res.send(err);
+            console.log(err);
         });
     });
     // POST a Software
     app.post('/api/software', middlewares.requireLogin, function (req, res) {
-        // let software = req.body.software;
         var software = {
             softwareId: req.body.softwareId,
             softwareName: req.body.softwareName,
@@ -51,7 +38,12 @@ module.exports = function (app) {
             licenceCost: req.body.licenceCost
         };
         if (validateSoftware(software)) {
-            createSoftware(software, req, res);
+            softwares_1.addSoftware(software).then(function (soft) {
+                res.json(soft);
+            }).catch(function (err) {
+                res.send(err);
+                console.log(err);
+            });
         }
         else {
             console.error("Error : The software model is incorrect");
@@ -60,16 +52,15 @@ module.exports = function (app) {
     });
     // DELETE a Software by ID
     app.delete('/api/software/:software_id', middlewares.canEditSoft, function (req, res) {
-        if (!req.params.software_id) {
+        var id = req.params.software_id;
+        if (!id) {
             res.send("Error: Parameter software_id is undefined");
         }
-        Softwares.remove({
-            _id: req.params.software_id
-        }, function (err, soft) {
-            if (err) {
-                res.send(err);
-            }
-            res.json(req.params.software_id);
+        softwares_1.removeSoftware(id).then(function (soft) {
+            res.json(id);
+        }).catch(function (err) {
+            console.log(err);
+            res.send(err);
         });
     });
     // PUT ?? update

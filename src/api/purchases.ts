@@ -1,14 +1,9 @@
 import { AmountByYear } from '../models/purchase';
+import * as pManager from '../managers/purchases';
+
 
 module.exports = function (app) {
-	var PurchaseDb = require('../models/purchase');
-	var Purchases = PurchaseDb.Purchase;
-	// var SoftwareDb = require('../models/software');
-	// var Softwares = SoftwareDb.Software;
 	var middlewares = require('../middlewares');
-
-
-
 	// Functions
 
 	function fetchPurchases(req, res) {
@@ -76,38 +71,65 @@ module.exports = function (app) {
 				else if(amountOfYear.amount > 0) {
 					purchase.amounts.push(amountOfYear);
 				}
-				purchase.save(function(err) {
-					if(err) {
-						console.log(err);
-						res.status(500).send('Internal Server Error \nCan\'t change status of request. \nContact system admin.');
-					} else {
-						res.json(purchase);
-					}
-				});
+				pManager.updatePurchase(purchase).then(function(prc) {
+					res.json(prc)
+				}).catch(function(err) {
+					res.send(err);
+					console.log(err);
+				})
 			}
 		})
 	}
 
 	// Requests
-
+	app.all('/api/purchases', middlewares.eladTest);
 	// GET all Purchases
 	app.get('/api/purchases', middlewares.requireLogin, function (req, res) {
-		console.log('Hello World!!');
-		fetchPurchases(req, res);
-	})
-
-	// GET a Purchase by ID
-	app.get('/api/purchase/:purchase_id', middlewares.requireLogin, function (req, res) {
-		Purchases.findById(req.params.purchase_id)
-			.exec(function (err, prcs) {
-				if (err) {
-					res.send(err);
-				}
-
-				res.json(prcs);
-			});
+		// fetchPurchases(req, res);
+		pManager.getAllPurchases().then(function(prc) {
+			res.json(prc);
+		}).catch(function(err) {
+			res.send(err);
+			console.log(err);
+		});
 	});
 
+	// GET a Purchase by ID
+	app.get('/api/purchase/getOne/:purchase_id', middlewares.requireLogin, function (req, res) {
+		let id = req.params.purchase_id;
+		pManager.getPurchase(id).then(function(purchase) {
+			res.json(purchase);
+		}).catch(function(err) {
+			res.send(err);
+			console.log(err);
+		});
+	});
+
+	// Get a Purchase by SoftwareId
+	app.get('/api/purchase/bySoftware/:software_id', middlewares.requireLogin, function(req, res) {
+		let soft_id = req.params.software_id;
+		console.log(soft_id);
+		pManager.getPurchaseBySoftware(soft_id).then(function(purchase) {
+			res.json(purchase);
+		}).catch(function(err) {
+			res.send(err);
+			console.log(err);
+		});
+
+	})
+
+	// Delete Purhcases of a specific Software
+	app.delete('/api/purchases/bySoftware/:software_id', middlewares.requireLogin, function(req, res) {
+		let soft_id = req.params.software_id;
+		console.log(soft_id);
+		pManager.deletePurchasesBySoftware(soft_id).then(function(purchase) {
+			res.json(purchase);
+		}).catch(function(err) {
+			res.send(err);
+			console.log(err);
+		});
+
+	})
 
 	// POST a Purchase
 	app.post('/api/purchase', middlewares.requireLogin, function (req, res) {
@@ -118,7 +140,13 @@ module.exports = function (app) {
 			amounts: req.body.amounts
 		}
 		if (validatePurchase(purchase)) {
-			createPurchase(purchase, req, res);
+			pManager.addPurchase(purchase).then(function(prc) {
+				res.json(prc);
+			}).catch(function(err) {
+				res.send(err);
+				console.log(err);
+			})
+			// createPurchase(purchase, req, res);
 		}
 		else {
 			console.error("Error : The purchase model is incorrect");
@@ -128,23 +156,21 @@ module.exports = function (app) {
 
 	// DELETE a Purchase by ID
 	app.delete('/api/purchase/:purchase_id', middlewares.canEditSoft, function (req, res) {
-		if(!req.params.purchase_id){
+		let id = req.params.purchase_id;
+		if(!id){
 		    res.send("Error: Parameter purchase_id is undefined");
 		}
-		Purchases.remove({
-			_id: req.params.purchase_id
-		}, function (err, prcs) {
-			if (err) {
-				res.send(err);
-			}
-			res.json(req.params.purchase_id);
-		});
+		pManager.removePurchase(id).then(function(purchase) {
+			res.json(id);
+		}).catch(function(err) {
+			res.send(err);
+			console.log(err);
+		})
 	});
 
 	// PUT ?? update
 	app.put('/api/purchase/:purchase_id/newYear', middlewares.canEditSoft, function (req, res) {
 		let amountByYear: AmountByYear = req.body.amountByYear;
-		// let amountByYear = {"year": 1970,"amount": 5};
 		let purchase_id: string = req.params.purchase_id;
 		newAmountForYear(purchase_id, amountByYear, res);
 	});
