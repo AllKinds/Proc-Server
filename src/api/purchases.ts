@@ -122,6 +122,19 @@ module.exports = function (app) {
 
 	})
 
+	// Delete Purhcases of a specific Unit
+	app.delete('/api/purchases/byUnit/:unit_id', middlewares.requireLogin, function(req, res) {
+		let unit_id = req.params.unit_id;
+		console.log(unit_id);
+		pManager.deletePurchasesByUnit(unit_id).then(function(purchase) {
+			res.json(purchase);
+		}).catch(function(err) {
+			res.send(err);
+			console.log(err);
+		});
+
+	})
+
 	// POST a Purchase
 	app.post('/api/purchase', middlewares.requireLogin, function (req, res) {
 		// let purchase = req.body.purchase;

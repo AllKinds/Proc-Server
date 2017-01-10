@@ -46,6 +46,17 @@ export function deletePurchasesBySoftware(software_id) {
 	})
 }
 
+export function deletePurchasesByUnit(unit_id) {
+	return new Promise(function(resolve, reject) {
+		Purchases.remove({unit : new ObjectId(unit_id)}, function(err, obj){
+			if(err) {
+				reject(err);
+			}
+			resolve(obj);
+		})
+	})
+}
+
 export function addPurchase(purchase) {
 	return new Promise(function(resolve, reject) {
 		Purchases.create(purchase, function(err, prc) {
