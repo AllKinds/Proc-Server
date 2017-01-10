@@ -42,43 +42,34 @@ module.exports = function (app) {
 	}
 
 	function newAmountForYear(purchaseId: string, amountOfYear: AmountByYear, res) {
-		Purchases.findById(purchaseId, function(err, purchase) {
-			if(err) {
+		pManager.getPurchase(purchaseId).then(function(purchase) {
+			let years = [];
+			for(let i=0; i< purchase.amounts.length; i++) {
+				years.push( purchase.amounts[i].year );
+			}
+			if(years.includes(amountOfYear.year)){
+				// Udpate the yearlyAmount
+				let year_index = years.indexOf(amountOfYear.year);
+				if(amountOfYear.amount <= 0) {
+					purchase.amounts.splice(year_index, 1);
+				}
+				else { purchase.amounts[year_index] =  amountOfYear; }	
+			}
+			else if(amountOfYear.amount > 0) {
+				purchase.amounts.push(amountOfYear);
+			}
+			pManager.updatePurchase(purchase).then(function(prc) {
+				console.log(prc.amounts);
+				res.json(prc);
+				console.log("There");
+			}).catch(function(err) {
 				res.send(err);
-				console.error(err);
-			}
-			if(!purchase){
-				res.status(404).send('Purchase not found');
-			}
-			else {
-				let years = [];
-				for(let i=0; i< purchase.amounts.length; i++) {
-					years.push( purchase.amounts[i].year );
-				}
-				// for(let yearlyAmount in purchase.amounts){
-				// 	years.push(yearlyAmount.year);
-				// }
-				if(years.includes(amountOfYear.year)){
-					// Udpate the yearlyAmount
-					let year_index = years.indexOf(amountOfYear.year);
-					if(amountOfYear.amount <= 0) {
-						purchase.amounts.splice(year_index, 1);
-					}
-					else {
-						purchase.amounts[year_index] =  amountOfYear;
-					}
-				}
-				else if(amountOfYear.amount > 0) {
-					purchase.amounts.push(amountOfYear);
-				}
-				pManager.updatePurchase(purchase).then(function(prc) {
-					res.json(prc)
-				}).catch(function(err) {
-					res.send(err);
-					console.log(err);
-				})
-			}
-		})
+				console.log(err);
+			});
+		}).catch(function(err) {
+				res.send(err);
+				console.log(err);
+		});
 	}
 
 	// Requests
