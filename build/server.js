@@ -18,9 +18,10 @@ app.get('/', function (req, res) {
     res.send('Hello World');
 });
 // Routs
-require('./api/softwares.js')(app);
-require('./api/purchases.js')(app);
-require('./api/unit.js')(app);
+require('./api/softwares')(app);
+require('./api/purchases')(app);
+require('./api/unit')(app);
+require('./api/misc')(app);
 // Initialize
 var server = app.listen(3000, function () {
     var host = server.address().address;

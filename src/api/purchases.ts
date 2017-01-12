@@ -6,37 +6,6 @@ module.exports = function (app) {
 	var middlewares = require('../middlewares');
 	// Functions
 
-	function fetchPurchases(req, res) {
-		PurchaseDb.Purchase.find()
-			.populate('software')
-			.populate('unit')
-			.exec(function (err, prcss) {
-				if (err) {
-					res.send(err);
-				}
-				res.header("Access-Control-Allow-Origin", "*"); // No 'Access-Control-Allow-Origin' Fix
-				res.json(prcss);
-			});
-	}
-
-	function createPurchase(purchase, req, res) {
-		Purchases.create(purchase, function (err, prcs) {
-			if (err) {
-				res.send(err);
-				console.error(err);
-			}
-			prcs.populate('software').populate('unit', function(err) {
-				if(err) {
-					res.send(err);
-					console.error(err);
-				}
-				console.log(prcs);
-				res.json(prcs);
-			});
-			
-		});
-	}
-
 	function validatePurchase(prcs) {
 		return true;
 	}
@@ -73,16 +42,27 @@ module.exports = function (app) {
 	}
 
 	// Requests
-	app.all('/api/purchases', middlewares.eladTest);
+	app.use('/api/purchases', middlewares.requireLogin, middlewares.authUser);
 	// GET all Purchases
-	app.get('/api/purchases', middlewares.requireLogin, function (req, res) {
-		// fetchPurchases(req, res);
+	app.get('/api/purchases', middlewares.isManager, function (req, res) {
 		pManager.getAllPurchases().then(function(prc) {
 			res.json(prc);
 		}).catch(function(err) {
 			res.send(err);
 			console.log(err);
 		});
+	});
+
+	app.get('/api/purchases/byUnit/:unit_id', middlewares.requireLogin, function(req, res) {
+		let unit_id = req.params.unit_id;
+		if(unit_id) {
+			pManager.getPurchaseByUnit(unit_id).then(function(purchases) {
+				res.json(purchases);
+			}).catch(function(err) {
+				res.send(err);
+				console.log(err);
+			});
+		}
 	});
 
 	// GET a Purchase by ID
@@ -150,7 +130,6 @@ module.exports = function (app) {
 				res.send(err);
 				console.log(err);
 			})
-			// createPurchase(purchase, req, res);
 		}
 		else {
 			console.error("Error : The purchase model is incorrect");

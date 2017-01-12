@@ -22,7 +22,6 @@ module.exports = function (app) {
 			res.send(err);
 			console.log(err);
 		});
-		// fetchUnits(req, res);
 	})
 
 	// GET a Unit by ID
@@ -50,7 +49,6 @@ module.exports = function (app) {
 				res.send(err);
 				console.log(err);
 			});
-			// createUnit(unit, req, res);
 		}
 		else {
 			console.error("Error : The unit model is incorrect");
@@ -71,7 +69,5 @@ module.exports = function (app) {
 			console.log(err);
 		});
 	});
-
-	// PUT ?? update
 
 };
