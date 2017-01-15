@@ -12,12 +12,10 @@ module.exports.requireLogin = function(req, res, next){
 		"prms"		: "Admin",
 		"unit"		: "586c9d4ea31bdc0957621782"
 	}
-	// Check if user is authenticated
 	if(req.user) {
 		next();
 	} else {
 		res.redirect(403, '/login');
-		// res.status(303).send( { redirect: '/login' })
 	}
 };
 
