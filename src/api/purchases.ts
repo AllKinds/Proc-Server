@@ -42,9 +42,9 @@ module.exports = function (app) {
 	}
 
 	// Requests
-	app.use('/api/purchases', middlewares.requireLogin, middlewares.authUser);
+	// app.use('/api/purchases', middlewares.requireLogin, middlewares.authUser);
 	// GET all Purchases
-	app.get('/api/purchases', middlewares.isManager, function (req, res) {
+	app.get('/api/purchases', function (req, res) {
 		pManager.getAllPurchases().then(function(prc) {
 			res.json(prc);
 		}).catch(function(err) {
@@ -53,7 +53,7 @@ module.exports = function (app) {
 		});
 	});
 
-	app.get('/api/purchases/byUnit/:unit_id', middlewares.requireLogin, function(req, res) {
+	app.get('/api/purchases/byUnit/:unit_id', function (req, res) {
 		let unit_id = req.params.unit_id;
 		if(unit_id) {
 			pManager.getPurchaseByUnit(unit_id).then(function(purchases) {
@@ -77,7 +77,7 @@ module.exports = function (app) {
 	});
 
 	// Get a Purchase by SoftwareId
-	app.get('/api/purchase/bySoftware/:software_id', middlewares.requireLogin, function(req, res) {
+	app.get('/api/purchases/bySoftware/:software_id', middlewares.requireLogin, function(req, res) {
 		let soft_id = req.params.software_id;
 		console.log(soft_id);
 		pManager.getPurchaseBySoftware(soft_id).then(function(purchase) {

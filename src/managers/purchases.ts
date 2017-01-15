@@ -24,24 +24,30 @@ export function getPurchase(id) {
 
 export function getPurchaseBySoftware(software_id) {
 	return new Promise(function(resolve, reject) {
-		Purchases.find({software : new ObjectId(software_id)}, function(err,obj){
-			if(err) {
-				reject(err);
-			}
-			console.log(obj);
-			resolve(obj);
+		Purchases.find({software : new ObjectId(software_id)})
+			.populate('software')
+			.populate('unit')
+			.exec(function(err, objs) {
+				if(err) {
+					reject(err);
+				}
+				console.log(objs);
+				resolve(objs);
 		});
 	});
 }
 
 export function getPurchaseByUnit(unit_id) {
 	return new Promise(function(resolve, reject) {
-		Purchases.find({unit : new ObjectId(unit_id)}, function(err,obj){
-			if(err) {
-				reject(err);
-			}
-			console.log(obj);
-			resolve(obj);
+		Purchases.find({unit : new ObjectId(unit_id)})
+			.populate('software')
+			.populate('unit')
+			.exec(function(err, objs) {
+				if(err) {
+					reject(err);
+				}
+				console.log(objs);
+				resolve(objs);
 		});
 	});
 }
