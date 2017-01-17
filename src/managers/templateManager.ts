@@ -24,7 +24,7 @@ export function getOne(db, id) {
 
 export function getByField(db, field_name, field_value) {
 	return new Promise(function(resolve, reject) {
-		db.find({field_name:"${field_value}"}, function(err,obj){
+		db.find({field_name:`${field_value}`}, function(err,obj){
 			if(err) {
 				reject(err);
 			}
@@ -58,11 +58,11 @@ export function remove(db, id) {
 
 export function update(db, object) {
 	return new Promise(function(resolve, reject) {
-		object.save(function(err) {
+		object.save(function(err, obj) {
 			if(err) {
 				reject(err);
 			}
-			resolve(object);
+			resolve(obj);
 		})
 	})
 }

@@ -42,7 +42,7 @@ module.exports = function (app) {
 	}
 
 	// Requests
-	// app.use('/api/purchases', middlewares.requireLogin, middlewares.authUser);
+
 	// GET all Purchases
 	app.get('/api/purchases', function (req, res) {
 		pManager.getAllPurchases().then(function(prc) {

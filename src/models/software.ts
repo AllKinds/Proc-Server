@@ -2,10 +2,16 @@
 
 import * as mongoose from 'mongoose';
 
+export interface PriceByYear {
+	year: 	number;
+	price: 	number;
+}
+
 export interface ISoftware extends mongoose.Document {
 	softwareId: 	string;
 	softwareName: 	string;
 	publisherName: 	string;
+	pricesByYear:	Array<PriceByYear>;
 	type?: 			string;
 	info?: 			string;
 	licenceCost: 	number;
@@ -26,6 +32,7 @@ export const SoftwareSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
+	pricesByYear: Array,
 	type: String,
 	info: String,
 	licenceCost: {

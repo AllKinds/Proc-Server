@@ -96,5 +96,20 @@ export function removePurchase(id) {
 }
 
 export function updatePurchase(purchase) {
-	return update(Purchases, purchase);
+	return updateField(Purchases, purchase, "amounts");
 }
+
+
+export function updateField(db, object, field_name) {
+	return new Promise(function(resolve, reject) {
+		db.findByIdAndUpdate(
+			object._id,
+			{ $set: {"amounts": object[field_name]} },
+			{ new: true },
+			function(err, obj) {
+				if(err) {
+					reject(err);
+				}
+				resolve(obj);
+			})
+	})

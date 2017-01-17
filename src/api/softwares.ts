@@ -1,5 +1,6 @@
 // import { getAll, getOne, add, remove} from '../managers/templateManager';
-import { getAllSoftwares, getSoftware, addSoftware, removeSoftware} from '../managers/softwares';
+import * as sMngr from '../managers/softwares';
+import { PriceByYear } from '../models/software';
 
 module.exports = function (app) {
 	var SoftwareDb = require('../models/software');
@@ -13,11 +14,66 @@ module.exports = function (app) {
 		return true;
 	}
 
+	function validateSoftwareId(req, res, next) {
+		if(!req.params.software_id) {
+			res.send("Error: Parameter 'software_id' is undefined");
+		}
+		next();
+	}
+
+	function updatePriceOfYear(softwareId, priceByYear, res) {
+		sMngr.getSoftware(softwareId).then(function(software) {
+			let validPbY = (priceByYear.price >= 0);
+			if(!software.pricesByYear){
+				// if not defined yet - initialize it.
+				software.pricesByYear = [];
+			}
+			for(let i=0; i <= software.pricesByYear.length; i++) {
+				if(i == software.pricesByYear.length) {
+					// Insert Last
+					software.pricesByYear.push(priceByYear);
+					break;
+				}
+				let year = software.pricesByYear[i].year;
+				if(year == priceByYear.year){
+					// Update year
+					if(priceByYear.price < 0){
+						// Remove price of year
+						software.pricesByYear.splice(i,1);
+						validPbY = true;
+					} else {
+						software.pricesByYear[i] = priceByYear;
+					}
+					break;
+				}
+				if(year > priceByYear.year) {
+					// Insert Between
+					software.pricesByYear.splice(i,0,priceByYear);
+					break;
+				}
+				
+			}
+			if(!validPbY) {
+				res.send("Price is not a valid numebr");
+				return;
+			}
+			sMngr.updateSoftware(software).then(function(sft) {
+				res.json(sft);
+			}).catch(function(err) {
+				res.send(err);
+				console.log(err);
+			});
+		}).catch(function(err) {
+			res.send(err);
+			console.log(err);
+		});
+	}
+
 	// Requests
 
 	// GET all Softwares
 	app.get('/api/softwares', middlewares.requireLogin, function (req, res) {
-		getAllSoftwares().then(function(result) {
+		sMngr.getAllSoftwares().then(function(result) {
 			res.json(result);
 		}).catch(function(err) {
 			res.send(err);
@@ -28,7 +84,7 @@ module.exports = function (app) {
 	// GET a Software by ID
 	app.get('/api/software/:software_id', middlewares.requireLogin, function (req, res) {
 		let id = req.params.software_id
-		getSoftware(id).then(function(soft) {
+		sMngr.getSoftware(id).then(function(soft) {
 			res.json(soft);
 		}).catch(function(err) {
 			res.send(err);
@@ -46,7 +102,7 @@ module.exports = function (app) {
 			licenceCost: req.body.licenceCost
 		}
 		if (validateSoftware(software)) {
-			addSoftware(software).then(function(soft) {
+			sMngr.addSoftware(software).then(function(soft) {
 				res.json(soft)
 			}).catch(function(err) {
 				res.send(err);
@@ -61,11 +117,11 @@ module.exports = function (app) {
 
 	// DELETE a Software by ID
 	app.delete('/api/software/:software_id', middlewares.canEditSoft, function (req, res) {
-		let id = req.params.software_id
+		let id = req.params.software_id;
 		if(!id){
 		    res.send("Error: Parameter software_id is undefined");
 		}
-		removeSoftware(id).then(function(soft) {
+		sMngr.removeSoftware(id).then(function(soft) {
 			res.json(id);
 		}).catch(function(err) {
 			console.log(err);
@@ -73,6 +129,9 @@ module.exports = function (app) {
 		})
 	});
 
-	// PUT ?? update
-
+	app.put('/api/software/updateYearPrice/:software_id', function (req, res) {
+		let id = req.params.software_id;
+		let priceOfYear = req.body.priceOfYear;
+		updatePriceOfYear(id, priceOfYear, res);
+	})
 };
