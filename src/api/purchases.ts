@@ -53,10 +53,46 @@ module.exports = function (app) {
 		});
 	});
 
+	app.get('/api/purchases/search/:filter', function (req, res) {
+		let filter = req.params.filter;
+		pManager.getWithFilter(filter).then(function(prc) {
+			res.json(prc);
+		}).catch(function(err) {
+			res.send(err);
+			console.log(err);
+		});
+	});
+
+	app.get('/api/purchases/pivot', function(req, res) {
+		let filter = {
+			year: req.body.year,
+			unitId: req.body.unitId
+		}
+		pManager.getPivot(filter).then(function(prc) {
+			res.json(prc);
+		}).catch(function(err) {
+			res.send(err);
+			console.log(err);
+		})
+
+	})
+
 	app.get('/api/purchases/byUnit/:unit_id', function (req, res) {
 		let unit_id = req.params.unit_id;
 		if(unit_id) {
 			pManager.getPurchaseByUnit(unit_id).then(function(purchases) {
+				res.json(purchases);
+			}).catch(function(err) {
+				res.send(err);
+				console.log(err);
+			});
+		}
+	});
+
+	app.get('/api/purchases/byUnitName/:unitName', function (req, res) {
+		let unitName = req.params.unitName;
+		if(unitName) {
+			pManager.getPurchaseByUnitName(unitName).then(function(purchases) {
 				res.json(purchases);
 			}).catch(function(err) {
 				res.send(err);
