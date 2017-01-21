@@ -11,9 +11,10 @@ export interface AmountByYear {
 let Schema = mongoose.Schema;
 
 export interface IPurchase extends mongoose.Document {
-	software: 	any;
-	unit:		any;
-	amounts: 	AmountByYear[];
+	software: 		any;
+	unit:			any;
+	amounts: 		AmountByYear[];
+	lastUpdated: 	Date;
 };
 
 export const PurchaseSchema = new mongoose.Schema({
@@ -27,7 +28,11 @@ export const PurchaseSchema = new mongoose.Schema({
 		ref:  'Unit',
 		required: true
 	},
-	amounts: Array
+	amounts: Array,
+	lastUpdated: {
+		type: Date,
+		default: new Date(1470000000000)
+	}
 });
 
 export let Purchase = mongoose.model<IPurchase>('Purchase', PurchaseSchema);

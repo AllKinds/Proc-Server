@@ -196,7 +196,7 @@ export function updateField(db, object, field_name) {
 	return new Promise(function(resolve, reject) {
 		db.findByIdAndUpdate(
 			object._id,
-			{ $set: {"amounts": object[field_name]} },
+			{ $set: {"amounts": object[field_name], "lastUpdated": new Date()} },
 			{ new: true })
 		   .populate('software')
 		   .exec(function(err, obj) {
@@ -206,3 +206,4 @@ export function updateField(db, object, field_name) {
 				resolve(obj);
 			})
 	})
+}

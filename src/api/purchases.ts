@@ -157,7 +157,8 @@ module.exports = function (app) {
 		let purchase = {
 			software: req.body.software,
 			unit: req.body.unit,
-			amounts: req.body.amounts
+			amounts: req.body.amounts,
+			lastUpdated: new Date()
 		}
 		if (validatePurchase(purchase)) {
 			pManager.addPurchase(purchase).then(function(prc) {

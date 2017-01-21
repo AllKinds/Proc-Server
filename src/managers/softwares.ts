@@ -35,3 +35,4 @@ export function updateField(db, object, field_name) {
 				resolve(obj);
 			})
 	})
+}
