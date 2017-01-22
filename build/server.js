@@ -1,11 +1,11 @@
 ///<reference path="../typings/index.d.ts"/>
 "use strict";
-var express = require("express");
-var cors = require("cors");
-var bodyParser = require("body-parser"); // Pull info grom HTML POST
-var methodOverride = require("method-override"); // Lets you use HTTP verbs such as PUT or DELETE in places where the client doesn't support it.
-var mongoose = require("mongoose");
-var morgan = require("morgan"); // Log every request to console
+var express = require('express');
+var cors = require('cors');
+var bodyParser = require('body-parser'); // Pull info grom HTML POST
+var methodOverride = require('method-override'); // Lets you use HTTP verbs such as PUT or DELETE in places where the client doesn't support it.
+var mongoose = require('mongoose');
+var morgan = require('morgan'); // Log every request to console
 var app = express();
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/proc');

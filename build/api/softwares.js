@@ -1,6 +1,6 @@
 "use strict";
 // import { getAll, getOne, add, remove} from '../managers/templateManager';
-var sMngr = require("../managers/softwares");
+var sMngr = require('../managers/softwares');
 module.exports = function (app) {
     var SoftwareDb = require('../models/software');
     var Softwares = SoftwareDb.Software;
