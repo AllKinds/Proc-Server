@@ -1,6 +1,6 @@
 "use strict";
 // import { getAll, getOne, add, remove} from '../managers/templateManager';
-var sMngr = require('../managers/softwares');
+var sMngr = require("../managers/softwares");
 module.exports = function (app) {
     var SoftwareDb = require('../models/software');
     var Softwares = SoftwareDb.Software;
@@ -87,6 +87,15 @@ module.exports = function (app) {
         }).catch(function (err) {
             res.send(err);
             console.error(err);
+        });
+    });
+    app.get('/api/softwares/search/:filter', function (req, res) {
+        var filter = req.params.filter;
+        sMngr.getWithFilter(filter).then(function (prc) {
+            res.json(prc);
+        }).catch(function (err) {
+            res.send(err);
+            console.log(err);
         });
     });
     // GET a Software by ID

@@ -98,6 +98,16 @@ module.exports = function (app) {
 		})
 	})
 
+	app.get('/api/softwares/search/:filter', function (req, res) {
+		let filter = req.params.filter;
+		sMngr.getWithFilter(filter).then(function(prc) {
+			res.json(prc);
+		}).catch(function(err) {
+			res.send(err);
+			console.log(err);
+		});
+	});
+
 	// GET a Software by ID
 	app.get('/api/software/:software_id', middlewares.requireLogin, function (req, res) {
 		let id = req.params.software_id

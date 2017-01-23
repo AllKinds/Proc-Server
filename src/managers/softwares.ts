@@ -1,10 +1,26 @@
-import { getAll, getOne, add, remove, update} from '../managers/templateManager';
+import { getAll, getOne, add, remove, update, filterObjects} from '../managers/templateManager';
 
 var SoftwareDb = require('../models/software');
 var Softwares = SoftwareDb.Software;
 
 export function getAllSoftwares() {
 	return getAll(Softwares)
+}
+
+export function getWithFilter(filter){
+	if(filter == ""){
+		return getAllSoftwares();
+	}
+	return new Promise(function(resolve, reject) {
+		Softwares.find()
+				 .exec(function(err, prcs) {
+				 	if(err) {
+				 		reject(err);
+				 	} else {
+				 		resolve(filterObjects(prcs, filter));
+				 	}
+				 });
+	});
 }
 
 export function getSoftware(id) {
