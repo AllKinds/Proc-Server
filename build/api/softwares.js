@@ -51,7 +51,24 @@ module.exports = function (app) {
                 res.send("Price is not a valid numebr");
                 return;
             }
-            sMngr.updateSoftware(software).then(function (sft) {
+            sMngr.updateSoftwarePbY(software).then(function (sft) {
+                res.json(sft);
+            }).catch(function (err) {
+                res.send(err);
+                console.log(err);
+            });
+        }).catch(function (err) {
+            res.send(err);
+            console.log(err);
+        });
+    }
+    function addNewField(softwareId, prop, res) {
+        var isUpdated = false;
+        sMngr.getSoftware(softwareId).then(function (software) {
+            if (!software.properties)
+                software.properties = {};
+            software.properties[prop.key] = prop.value;
+            sMngr.updateSoftwareProps(software).then(function (sft) {
                 res.json(sft);
             }).catch(function (err) {
                 res.send(err);
@@ -120,6 +137,11 @@ module.exports = function (app) {
         var id = req.params.software_id;
         var priceOfYear = req.body.priceOfYear;
         updatePriceOfYear(id, priceOfYear, res);
+    });
+    app.put('/api/software/addField/:software_id', function (req, res) {
+        var id = req.params.software_id;
+        var prop = req.body.property;
+        addNewField(id, prop, res);
     });
 };
 

@@ -18,15 +18,29 @@ export function addSoftware(object) {
 export function removeSoftware(id) {
 	return remove(Softwares, id);
 }
-export function updateSoftware(software) {
+export function updateSoftwarePbY(software) {
 	return updateField(Softwares, software, 'pricesByYear');
 }
-
+export function updateSoftwareProps(software) {
+	let field_name = 'properties';
+	return new Promise(function(resolve, reject) {
+		Softwares.update(
+			{_id: software._id},
+			{$set: { 'properties': software[field_name] }}, 
+			{strict: false}, 
+			function(err, obj) {
+				if(err) {
+					reject(err);
+				}
+				resolve(obj);
+			});
+	})
+}
 export function updateField(db, object, field_name) {
 	return new Promise(function(resolve, reject) {
 		db.findByIdAndUpdate(
 			object._id,
-			{ $set: {"pricesByYear": object[field_name]} },
+			{ $set: {field_name: object[field_name]} },
 			{ new: true },
 			function(err, obj) {
 				if(err) {
@@ -36,3 +50,4 @@ export function updateField(db, object, field_name) {
 			})
 	})
 }
+

@@ -1,6 +1,6 @@
 // import { getAll, getOne, add, remove} from '../managers/templateManager';
 import * as sMngr from '../managers/softwares';
-import { PriceByYear } from '../models/software';
+import { PriceByYear, Property } from '../models/software';
 
 module.exports = function (app) {
 	var SoftwareDb = require('../models/software');
@@ -57,7 +57,24 @@ module.exports = function (app) {
 				res.send("Price is not a valid numebr");
 				return;
 			}
-			sMngr.updateSoftware(software).then(function(sft) {
+			sMngr.updateSoftwarePbY(software).then(function(sft) {
+				res.json(sft);
+			}).catch(function(err) {
+				res.send(err);
+				console.log(err);
+			});
+		}).catch(function(err) {
+			res.send(err);
+			console.log(err);
+		});
+	}
+
+	function addNewField(softwareId, prop: Property, res) {
+		let isUpdated = false;
+		sMngr.getSoftware(softwareId).then(function(software) {
+			if(!software.properties) software.properties = {};
+			software.properties[prop.key] = prop.value;
+			sMngr.updateSoftwareProps(software).then(function(sft) {
 				res.json(sft);
 			}).catch(function(err) {
 				res.send(err);
@@ -133,5 +150,11 @@ module.exports = function (app) {
 		let id = req.params.software_id;
 		let priceOfYear = req.body.priceOfYear;
 		updatePriceOfYear(id, priceOfYear, res);
-	})
+	});
+
+	app.put('/api/software/addField/:software_id', function(req, res) {
+		let id = req.params.software_id;
+		let prop = req.body.property;
+		addNewField(id, prop, res);
+	});
 };

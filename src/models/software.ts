@@ -7,6 +7,11 @@ export interface PriceByYear {
 	price: 	number;
 }
 
+export interface Property {
+	key: string,
+	value: any
+}
+
 export interface ISoftware extends mongoose.Document {
 	softwareId: 	string;
 	softwareName: 	string;
@@ -17,6 +22,8 @@ export interface ISoftware extends mongoose.Document {
 	licenceCost: 	number;
 	supportCost?: 	number;
 	updateCost?: 	number;
+	properties:			Object;
+
 };
 
 export const SoftwareSchema = new mongoose.Schema({
@@ -40,7 +47,8 @@ export const SoftwareSchema = new mongoose.Schema({
 		required: true
 	},
 	supportCost: Number,
-	updateCost: Number
+	updateCost: Number,
+	properties: {}
 });
 
 export let Software = mongoose.model<ISoftware>('Software', SoftwareSchema);
