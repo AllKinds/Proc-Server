@@ -21,6 +21,7 @@ app.get('/', function (req, res) {
 require('./api/softwares')(app);
 require('./api/purchases')(app);
 require('./api/unit')(app);
+require('./api/users')(app);
 require('./api/misc')(app);
 // Initialize
 var server = app.listen(3000, function () {

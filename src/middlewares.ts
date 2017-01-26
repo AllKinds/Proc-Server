@@ -6,12 +6,11 @@ export type Permissions =
 
 module.exports.requireLogin = function(req, res, next){
 	req.user = {
-		"firstName" : "Avi",
-		"lastName"  : "Ron",
-		"uniqeId"	: "1234",
-		"prms"		: "Admin",
-		"unit"		: "586c9d4ea31bdc0957621782"
-	}
+		id:	"123456789",
+		name: "Avi Ron",
+		permission: "Admin",
+		unitId: "586c9d4ea31bdc0957621782"
+	};
 	if(req.user) {
 		next();
 	} else {

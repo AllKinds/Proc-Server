@@ -1,3 +1,5 @@
+import * as mongoose from 'mongoose';
+
 export type Permissions =
 		"Basic"
 	|	"Unit"
@@ -5,7 +7,7 @@ export type Permissions =
 	|	"Admin"
 
 
-export class User {
+export class IUser {
 	id: string;
 	// firstName: string;
 	// lastName: string;
@@ -30,3 +32,28 @@ export class User {
 		this.unitId = unitId;
 	}
 }
+
+export const UserSchema = new mongoose.Schema({
+	id: {
+		type: String,
+		required: true
+	},
+	name: {
+		type: String,
+		required: true
+	},
+	permission: {
+		type: Object,
+		default: "Basic"
+	},
+	authCode: {
+		type: String,
+
+	},
+	unitId: {
+		type: String,
+		default: ""
+	}
+});
+
+export let User = mongoose.model<IUser>('User', UserSchema)
